@@ -37,14 +37,20 @@ This diagram shows the happy path flow of the application:
 The implementation of this domain is being done with an enterprise-grade stack, focused on robustness and best practices.
 
 - **Language:** Java 21 (OpenJDK).
+- **Framework:** Spring Boot 3.2.0 (with Spring Web, Spring Data JPA).
+- **Database:** PostgreSQL.
+- **ORM:** Hibernate (via Spring Data JPA).
+- **Build Tool:** Maven.
+- **Testing:** JUnit 5 with Spring Boot Test.
+- **Architecture:** Hexagonal Architecture (Domain, Infrastructure, API layers).
 - **Design Principles:** Rich Domain Model (above anemic model), Clean Architecture foundations, Immutability.
 
 ## 5. Project Status and Next Steps
 
 ### Current Status:
 ✅ Domain Model (domain) defined and fully implemented. Includes the Transaction entity, Value Objects, and the TransactionRepository interface.
+✅ Infrastructure layer (infrastructure) implemented using Spring Data JPA and PostgreSQL.
+✅ RESTful API (api) built with Spring Boot to expose CRUD operations with standardized ApiResponse format.
 
 ### Next Steps:
-🔜 Implement the Infrastructure layer (infrastructure) using Spring Data JPA and PostgreSQL.  
-🔜 Build the RESTful API (api) with Spring Boot to expose CRUD operations.  
-🔜 Integrate with n8n for the voice capture workflow.
+🔜 Integrate with n8n for the voice capture workflow (voice notes or text via WhatsApp or Telegram).
