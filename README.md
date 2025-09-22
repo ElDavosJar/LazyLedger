@@ -22,7 +22,7 @@ The Transaction entity protects its own state (immutability, no setters) and is 
 
 This diagram represents the current and complete state of the domain model:
 
-![Domain Model Diagram](./docs/diagrams/domain-model.png)
+![Domain Model Diagram](./docs/diagrams/domain-model.jpg)
 
 *(Note: Link to your domain class diagram)*
 
@@ -30,14 +30,14 @@ This diagram represents the current and complete state of the domain model:
 
 This diagram shows the happy path flow of the application:
 
-![Activity Diagram](./docs/diagrams/activity-diagram.png)
+![Activity Diagram](./docs/diagrams/activity-diagram.jpg)
 
 ## 4. Selected Technology Stack
 
 The implementation of this domain is being done with an enterprise-grade stack, focused on robustness and best practices.
 
 - **Language:** Java 21 (OpenJDK).
-- **Design Principles:** Pragmatic Domain-Driven Design (DDD), Clean Architecture, Immutability.
+- **Design Principles:** Rich Domain Model (above anemic model), Clean Architecture foundations, Immutability.
 
 ## 5. Project Status and Next Steps
 
