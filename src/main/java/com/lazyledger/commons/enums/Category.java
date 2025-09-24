@@ -8,6 +8,7 @@ public enum Category {
     ENTERTAINMENT("entertainment"),
     HEALTH("health"),
     EDUCATION("education"),
+    INCOME("income"),
     OTHER("other");
 
     private final String value;

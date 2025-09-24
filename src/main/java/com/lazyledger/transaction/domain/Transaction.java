@@ -4,8 +4,11 @@ import com.lazyledger.commons.TransactionId;
 import com.lazyledger.commons.UserId;
 import com.lazyledger.commons.enums.Category;
 
+import java.math.BigDecimal;
 import java.time.Instant;
 import java.util.Objects;
+import java.util.UUID;
+
 
 public class Transaction {
     private final TransactionId id;
@@ -68,15 +71,16 @@ public class Transaction {
     }
 
     @Override
+    //present simularly to JSON format for easy reading
     public String toString() {
-        return "Transaction{" +
+        return "Transaction{\n" +
                 "id=" + id +
-                ", userId=" + userId +
-                ", amount=" + amount +
-                ", description=" + description +
-                ", category=" + category +
-                ", createdAt=" + createdAt +
-                ", transactionDate=" + transactionDate +
+                ",\n userId=" + userId +
+                ",\n amount=" + amount +
+                ",\n description=" + description +
+                ",\n category=" + category +
+                ",\n createdAt=" + createdAt +
+                ",\n transactionDate=" + transactionDate +
                 '}';
     }
 
@@ -90,5 +94,17 @@ public class Transaction {
     @Override
     public int hashCode() {
         return Objects.hash(id);
+    }
+
+    public static void main(String[] args) {
+        UserId userId = UserId.of(UUID.fromString("00000000-0000-0000-0000-000000000001"));
+        TransactionId transactionId = TransactionId.of(UUID.randomUUID());
+        Amount amount = Amount.of(BigDecimal.valueOf(100.00), "USD");
+        Description description = Description.of("Grocery shopping");
+        Category category = Category.FOOD;
+        TransactionDate transactionDate = TransactionDate.of(null);
+
+        Transaction transaction = Transaction.of(transactionId, userId, amount, description, category, transactionDate);
+        System.out.println(transaction);
     }
 }

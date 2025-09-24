@@ -7,6 +7,9 @@ public record Description(String text) {
             throw new IllegalArgumentException("Description must not exceed 255 characters");
         }
     }
+    public static Description of(String text) {
+        return new Description(text);
+    }
     @Override
     public String toString() {
         return text;
