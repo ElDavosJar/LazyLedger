@@ -1,16 +1,31 @@
 package com.lazyledger.trancriptionModule;
 
+import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.MediaType;
+import org.springframework.stereotype.Component;
 import org.springframework.web.reactive.function.client.WebClient;
 
 import java.util.Base64;
+import java.util.List;
 import java.util.Map;
 
-public class AudioTranscriber {
+@Component
+@Qualifier("audio")
+@SuppressWarnings("rawtypes")
+public class AudioTranscriber implements Transcriber {
+
+    @Value("${google.ai.api.key}")
+    private String apiKey;
 
     private static final WebClient webClient = WebClient.builder()
         .baseUrl("https://generativelanguage.googleapis.com")
         .build();
+
+    @Override
+    public String transcribe(byte[] data) {
+        return transcribeAudioToText(data, "audio/ogg", apiKey);
+    }
 
     public static String transcribeAudioToText(byte[] audioBytes, String contentType, String apiKey) {
         try {
@@ -19,8 +34,8 @@ public class AudioTranscriber {
             String prompt = "Transcribe this audio file to text. Return only the transcription text, nothing else.";
 
             Map<String, Object> requestBody = Map.of(
-                "contents", java.util.List.of(Map.of(
-                    "parts", java.util.List.of(
+                "contents", List.of(Map.of(
+                    "parts", List.of(
                         Map.of("text", prompt),
                         Map.of("inline_data", Map.of(
                             "mime_type", contentType,
@@ -43,11 +58,11 @@ public class AudioTranscriber {
                 .block();
 
             if (response != null && response.containsKey("candidates")) {
-                java.util.List candidates = (java.util.List) response.get("candidates");
+                List candidates = (List) response.get("candidates");
                 if (!candidates.isEmpty()) {
                     Map candidate = (Map) candidates.get(0);
                     Map content = (Map) candidate.get("content");
-                    java.util.List parts = (java.util.List) content.get("parts");
+                    List parts = (List) content.get("parts");
                     if (!parts.isEmpty()) {
                         Map part = (Map) parts.get(0);
                         return (String) part.get("text");
