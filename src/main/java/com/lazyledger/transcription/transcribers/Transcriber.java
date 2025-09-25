@@ -1,4 +1,4 @@
-package com.lazyledger.trancriptionModule;
+package com.lazyledger.transcription.transcribers;
 
 public interface Transcriber {
 

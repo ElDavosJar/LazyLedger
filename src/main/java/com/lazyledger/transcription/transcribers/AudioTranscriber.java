@@ -1,4 +1,4 @@
-package com.lazyledger.trancriptionModule;
+package com.lazyledger.transcription.transcribers;
 
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;

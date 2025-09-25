@@ -67,7 +67,7 @@ LazyLedger now integrates with Telegram Bot API to capture messages in real-time
 - **MessageProcessorService**: Orchestrates transcription, extraction, and persistence, with asynchronous feedback to users.
 
 ### Features:
-- **Multi-Media Support**: Handles text, audio, images, documents, and videos.
+- **Multi-Media Support**: Handles text, audio, images, documents.
 - **Binary Processing**: Downloads and transcribes files to plain text for LLM processing.
 - **Asynchronous Feedback**: Sends confirmation messages to users after transaction saving, including transaction code.
 - **Transaction Codes**: Sequential ID per user for UX (e.g., TX-001), with internal UUID for machine processing.

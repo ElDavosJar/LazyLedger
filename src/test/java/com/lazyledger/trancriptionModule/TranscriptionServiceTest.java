@@ -2,9 +2,10 @@ package com.lazyledger.trancriptionModule;
 
 import org.junit.jupiter.api.Test;
 import org.springframework.core.io.ClassPathResource;
+import java.nio.file.Path;
 
 import java.nio.file.Files;
-import java.nio.file.Path;
+import com.lazyledger.transcription.transcribers.AudioTranscriber;
 
 class AudioTranscriberTest {
 

@@ -1,27 +1,21 @@
 package com.lazyledger.transaction.infrastructure.externalApps.adapters.telegram;
 
-import com.lazyledger.trancriptionModule.TransactionDataDto;
-import com.lazyledger.trancriptionModule.TranscriptionService;
-import com.lazyledger.transaction.application.TransactionService;
-import com.lazyledger.transaction.domain.Transaction;
+import com.lazyledger.transaction.api.dto.TransactionDto;
+import com.lazyledger.transaction.infrastructure.externalApps.ExternalApiServiceFacade;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 
-import java.time.format.DateTimeFormatter;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 @Service
 public class MessageProcessorService {
-
+    
     @Autowired
-    private TranscriptionService transcriptionService;
-
-    @Autowired
-    private TransactionService transactionService;
+    private ExternalApiServiceFacade externalApiServiceFacade;
 
     @Autowired
     private RestTemplate restTemplate;
@@ -30,26 +24,25 @@ public class MessageProcessorService {
     private String botToken;
 
     public void processMessage(MessageDto dto) {
-        List<TransactionDataDto> transactions;
+        List<TransactionDto> savedTransactions;
         if ("text".equals(dto.getMediaType())) {
-            transactions = transcriptionService.transcribeAndExtractTransactions(dto.getContent().getBytes(), "text");
+            savedTransactions = externalApiServiceFacade.processFile(dto.getContent().getBytes(), "text");
         } else if (dto.getBinaryData() != null) {
-            transactions = transcriptionService.transcribeAndExtractTransactions(dto.getBinaryData(), dto.getMediaType());
+            savedTransactions = externalApiServiceFacade.processFile(dto.getBinaryData(), dto.getMediaType());
         } else {
             return; // No data to process
         }
 
-        for (TransactionDataDto transaction : transactions) {
-            Transaction saved = transactionService.save(transaction);
-            sendFeedback(dto.getChatId(), saved, transaction);
+        for (TransactionDto transaction : savedTransactions) {
+            sendFeedback(dto.getChatId(), transaction);
         }
     }
 
-    private void sendFeedback(String chatId, Transaction transaction, TransactionDataDto dto) {
-        String type = transaction.getAmount().value().doubleValue() >= 0 ? "ingreso" : "gasto";
-        String amountStr = transaction.getAmount().value().toString() + " " + transaction.getAmount().currency();
-        String dateStr = transaction.getTransactionDate().value().format(DateTimeFormatter.ofPattern("yyyy-MM-dd"));
-        String transactionCode = "001"; // Default as requested
+    private void sendFeedback(String chatId, TransactionDto transaction) {
+        String type = transaction.amount().doubleValue() >= 0 ? "ingreso" : "gasto";
+        String amountStr = transaction.amount() + " " + transaction.currency();
+        String dateStr = transaction.transactionDate();
+        String transactionCode = transaction.transactionNumber().toString();
 
         String message = String.format(
             "Se ha guardado. Ha registrado un %s de %s en fecha %s. Código de transacción: %s",

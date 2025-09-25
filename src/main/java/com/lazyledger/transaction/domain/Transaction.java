@@ -13,16 +13,18 @@ import java.util.UUID;
 public class Transaction {
     private final TransactionId id;
     private final UserId userId;
+    private final Long transactionNumber;
     private final Amount amount;
     private final Description description;
     private final Category category;
     private final Instant createdAt;
     private final TransactionDate transactionDate;
 
-    private Transaction(TransactionId id, UserId userId, Amount amount,
+    private Transaction(TransactionId id, UserId userId, Long transactionNumber, Amount amount,
                         Description description, Category category, Instant createdAt, TransactionDate transactionDate) {
         this.id = Objects.requireNonNull(id, "Transaction id must be non-null");
         this.userId = Objects.requireNonNull(userId, "UserId must be non-null");
+        this.transactionNumber = Objects.requireNonNull(transactionNumber, "TransactionNumber must be non-null");
         this.amount = Objects.requireNonNull(amount, "Amount must be non-null");
         this.description = description; // optional
         this.category = Objects.requireNonNull(category, "Category must be non-null");
@@ -31,15 +33,15 @@ public class Transaction {
     }
 
     // Factory for new transactions
-    public static Transaction of(TransactionId id, UserId userId, Amount amount,
+    public static Transaction of(TransactionId id, UserId userId, Long transactionNumber, Amount amount,
                                  Description description, Category category, TransactionDate transactionDate) {
-        return new Transaction(id, userId, amount, description, category, Instant.now(), transactionDate);
+        return new Transaction(id, userId, transactionNumber, amount, description, category, Instant.now(), transactionDate);
     }
 
     // Rehydrate from persistence
-    public static Transaction rehydrate(TransactionId id, UserId userId, Amount amount,
+    public static Transaction rehydrate(TransactionId id, UserId userId, Long transactionNumber, Amount amount,
                                         Description description, Category category, Instant createdAt, TransactionDate transactionDate) {
-        return new Transaction(id, userId, amount, description, category, createdAt, transactionDate);
+        return new Transaction(id, userId, transactionNumber, amount, description, category, createdAt, transactionDate);
     }
 
     public TransactionId getId() {
@@ -48,6 +50,10 @@ public class Transaction {
 
     public UserId getUserId() {
         return userId;
+    }
+
+    public Long getTransactionNumber() {
+        return transactionNumber;
     }
 
     public Amount getAmount() {
@@ -76,6 +82,7 @@ public class Transaction {
         return "Transaction{\n" +
                 "id=" + id +
                 ",\n userId=" + userId +
+                ",\n transactionNumber=" + transactionNumber +
                 ",\n amount=" + amount +
                 ",\n description=" + description +
                 ",\n category=" + category +
@@ -104,7 +111,7 @@ public class Transaction {
         Category category = Category.FOOD;
         TransactionDate transactionDate = TransactionDate.of(null);
 
-        Transaction transaction = Transaction.of(transactionId, userId, amount, description, category, transactionDate);
+        Transaction transaction = Transaction.of(transactionId, userId, 1L, amount, description, category, transactionDate);
         System.out.println(transaction);
     }
 }

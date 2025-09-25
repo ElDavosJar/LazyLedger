@@ -23,7 +23,7 @@ class TransactionTest {
 
     @Test
     void testOfCreatesTransactionWithCurrentTime() {
-        Transaction transaction = Transaction.of(id, userId, amount, description, category, transactionDate);
+        Transaction transaction = Transaction.of(id, userId, 1L, amount, description, category, transactionDate);
 
         assertEquals(id, transaction.getId());
         assertEquals(userId, transaction.getUserId());
@@ -38,7 +38,7 @@ class TransactionTest {
     @Test
     void testRehydrateCreatesTransactionWithGivenTime() {
         Instant createdAt = Instant.parse("2023-01-01T00:00:00Z");
-        Transaction transaction = Transaction.rehydrate(id, userId, amount, description, category, createdAt, transactionDate);
+        Transaction transaction = Transaction.rehydrate(id, userId, 1L, amount, description, category, createdAt, transactionDate);
 
         assertEquals(id, transaction.getId());
         assertEquals(userId, transaction.getUserId());
@@ -51,7 +51,7 @@ class TransactionTest {
 
     @Test
     void testOfWithNullDescription() {
-        Transaction transaction = Transaction.of(id, userId, amount, null, category, transactionDate);
+        Transaction transaction = Transaction.of(id, userId, 1L, amount, null, category, transactionDate);
 
         assertNull(transaction.getDescription());
     }
@@ -59,7 +59,7 @@ class TransactionTest {
     @Test
     void testGetters() {
         Instant createdAt = Instant.now();
-        Transaction transaction = Transaction.rehydrate(id, userId, amount, description, category, createdAt, transactionDate);
+        Transaction transaction = Transaction.rehydrate(id, userId, 1L, amount, description, category, createdAt, transactionDate);
 
         assertEquals(id, transaction.getId());
         assertEquals(userId, transaction.getUserId());
@@ -72,7 +72,7 @@ class TransactionTest {
 
     @Test
     void testToString() {
-        Transaction transaction = Transaction.of(id, userId, amount, description, category, transactionDate);
+        Transaction transaction = Transaction.of(id, userId, 1L, amount, description, category, transactionDate);
         String toString = transaction.toString();
 
         assertTrue(toString.contains("Transaction{"));
@@ -87,10 +87,10 @@ class TransactionTest {
 
     @Test
     void testEquals() {
-        Transaction transaction1 = Transaction.of(id, userId, amount, description, category, transactionDate);
-        Transaction transaction2 = Transaction.rehydrate(id, userId, amount, description, category, Instant.now(), transactionDate);
+        Transaction transaction1 = Transaction.of(id, userId, 1L, amount, description, category, transactionDate);
+        Transaction transaction2 = Transaction.rehydrate(id, userId, 1L, amount, description, category, Instant.now(), transactionDate);
         TransactionId differentId = TransactionId.of(UUID.randomUUID());
-        Transaction transaction3 = Transaction.of(differentId, userId, amount, description, category, transactionDate);
+        Transaction transaction3 = Transaction.of(differentId, userId, 1L, amount, description, category, transactionDate);
 
         assertEquals(transaction1, transaction2); // same id
         assertNotEquals(transaction1, transaction3); // different id
@@ -100,8 +100,8 @@ class TransactionTest {
 
     @Test
     void testHashCode() {
-        Transaction transaction1 = Transaction.of(id, userId, amount, description, category, transactionDate);
-        Transaction transaction2 = Transaction.rehydrate(id, userId, amount, description, category, Instant.now(), transactionDate);
+        Transaction transaction1 = Transaction.of(id, userId, 1L, amount, description, category, transactionDate);
+        Transaction transaction2 = Transaction.rehydrate(id, userId, 1L, amount, description, category, Instant.now(), transactionDate);
 
         assertEquals(transaction1.hashCode(), transaction2.hashCode());
     }
@@ -109,66 +109,66 @@ class TransactionTest {
     @Test
     void testOfThrowsOnNullId() {
         assertThrows(NullPointerException.class, () ->
-            Transaction.of(null, userId, amount, description, category, transactionDate));
+            Transaction.of(null, userId, 1L, amount, description, category, transactionDate));
     }
 
     @Test
     void testOfThrowsOnNullUserId() {
         assertThrows(NullPointerException.class, () ->
-            Transaction.of(id, null, amount, description, category, transactionDate));
+            Transaction.of(id, null, 1L, amount, description, category, transactionDate));
     }
 
     @Test
     void testOfThrowsOnNullAmount() {
         assertThrows(NullPointerException.class, () ->
-            Transaction.of(id, userId, null, description, category, transactionDate));
+            Transaction.of(id, userId, 1L, null, description, category, transactionDate));
     }
 
     @Test
     void testOfThrowsOnNullCategory() {
         assertThrows(NullPointerException.class, () ->
-            Transaction.of(id, userId, amount, description, null, transactionDate));
+            Transaction.of(id, userId, 1L, amount, description, null, transactionDate));
     }
 
     @Test
     void testOfThrowsOnNullTransactionDate() {
         assertThrows(NullPointerException.class, () ->
-            Transaction.of(id, userId, amount, description, category, null));
+            Transaction.of(id, userId, 1L, amount, description, category, null));
     }
 
     @Test
     void testRehydrateThrowsOnNullId() {
         assertThrows(NullPointerException.class, () ->
-            Transaction.rehydrate(null, userId, amount, description, category, Instant.now(), transactionDate));
+            Transaction.rehydrate(null, userId, 1L, amount, description, category, Instant.now(), transactionDate));
     }
 
     @Test
     void testRehydrateThrowsOnNullUserId() {
         assertThrows(NullPointerException.class, () ->
-            Transaction.rehydrate(id, null, amount, description, category, Instant.now(), transactionDate));
+            Transaction.rehydrate(id, null, 1L, amount, description, category, Instant.now(), transactionDate));
     }
 
     @Test
     void testRehydrateThrowsOnNullAmount() {
         assertThrows(NullPointerException.class, () ->
-            Transaction.rehydrate(id, userId, null, description, category, Instant.now(), transactionDate));
+            Transaction.rehydrate(id, userId, 1L, null, description, category, Instant.now(), transactionDate));
     }
 
     @Test
     void testRehydrateThrowsOnNullCategory() {
         assertThrows(NullPointerException.class, () ->
-            Transaction.rehydrate(id, userId, amount, description, null, Instant.now(), transactionDate));
+            Transaction.rehydrate(id, userId, 1L, amount, description, null, Instant.now(), transactionDate));
     }
 
     @Test
     void testRehydrateThrowsOnNullCreatedAt() {
         assertThrows(NullPointerException.class, () ->
-            Transaction.rehydrate(id, userId, amount, description, category, null, transactionDate));
+            Transaction.rehydrate(id, userId, 1L, amount, description, category, null, transactionDate));
     }
 
     @Test
     void testRehydrateThrowsOnNullTransactionDate() {
         assertThrows(NullPointerException.class, () ->
-            Transaction.rehydrate(id, userId, amount, description, category, Instant.now(), null));
+            Transaction.rehydrate(id, userId, 1L, amount, description, category, Instant.now(), null));
     }
 }

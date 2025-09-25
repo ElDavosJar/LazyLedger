@@ -1,4 +1,4 @@
-package com.lazyledger.trancriptionModule;
+package com.lazyledger.transcription.extractor;
 
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -26,9 +26,11 @@ public class DataExtractor {
     public static List<TransactionDataDto> extractTransactionData(String transcriptionText, String apiKey) {
         int defaultYear = LocalDate.now().getYear(); // Para manejar fechas sin año
         try {
-            // El prompt ya está bien, pero he corregido la regla #6 para que coincida con la lógica del backend
+            // El prompt incluye la fecha actual para que el LLM pueda referenciar fechas relativas como ayer
+            String currentDate = LocalDate.now().format(DateTimeFormatter.ISO_LOCAL_DATE);
             String prompt = String.format(
                     "Eres un asistente experto en finanzas personales llamado \"LazyLedger\". Tu tarea es analizar rigurosamente el siguiente texto y extraer TODAS las transacciones, aplicando un signo negativo para los gastos y positivo para los ingresos.\n\n" +
+                    "La fecha actual es %s. Si el usuario se refiere a fechas relativas como 'ayer', 'hoy', 'anteayer', calcula la fecha correspondiente basada en esta fecha actual.\n\n" +
                     "Debes devolver el resultado como un array de objetos JSON. Cada objeto debe tener EXACTAMENTE los siguientes campos: \"amount\" (Number), \"currency\" (String), \"description\" (String), \"category\" (String), y \"transactionDate\" (String en formato YYYY-MM-DD).\n\n" +
                     "Sigue estas reglas ESTRICTAMENTE y sin excepción:\n\n" +
                     "### REGLAS DE EXTRACCIÓN ###\n" +
@@ -50,13 +52,14 @@ public class DataExtractor {
                     "        - **HEALTH**\n" +
                     "        - **EDUCATION**\n" +
                     "    *   Si un gasto no encaja CLARAMENTE en ninguna de las anteriores, la única alternativa permitida es **\"OTHER\"**.\n\n" +
-                    "6.  **TRANSACTION_DATE (String):** Si se menciona una fecha explícita, conviértela a YYYY-MM-DD si el año es mencionado establece con " + defaultYear + ". Si NO se menciona ninguna fecha, omite el campo.\n\n" +
+                    "6.  **TRANSACTION_DATE (String):** Si se menciona una fecha explícita o relativa, conviértela a YYYY-MM-DD. Si el año no es mencionado, usa " + defaultYear + ". Si NO se menciona ninguna fecha, omite el campo.\n\n" +
                     "7.  **SALIDA FINAL:** Si no encuentras transacciones válidas que cumplan todas estas reglas, devuelve un array JSON vacío: `[]`.\n\n" +
                     "Texto del usuario:\n" +
                     "\"\"\"\n" +
                     "%s\n" +
                     "\"\"\"\n\n" +
-                    "JSON de salida:\n", 
+                    "JSON de salida:\n",
+                    currentDate,
                     transcriptionText);
 
                     
@@ -96,30 +99,30 @@ public class DataExtractor {
                                 .replace("```", "")
                                 .trim();
 
-                        // Parsear el JSON a una Lista de DTOs para ser más flexible
+                        // Parsear el JSON a una Lista de mapas
                         List<Map> transactionsList = objectMapper.readValue(cleanJson, new TypeReference<>() {});
 
                         if (!transactionsList.isEmpty()) {
-                             // NOTA: Este código ahora solo procesa la primera transacción.
-                             // Se podría modificar para que devuelva la lista completa.
-                            @SuppressWarnings("unchecked")
-                            Map data = (Map<String, Object>) transactionsList.get(0);
-                            
-                            
-                            BigDecimal amount = new BigDecimal(data.getOrDefault("amount", "0.00").toString());
-                            String currency = (String) data.getOrDefault("currency", "USD");
-                            String description = (String) data.getOrDefault("description", "Transacción procesada");
-                            String category = (String) data.getOrDefault("category", "OTHER");
-                            
-                            // --- MANEJO DE FECHA NULA ---
-                            // Si la fecha es nula o no existe, usa la de hoy.
-                            String transactionDateStr = (String) data.get("transactionDate");
-                            if (transactionDateStr == null || transactionDateStr.isBlank()) {
-                                transactionDateStr = LocalDate.now().format(DateTimeFormatter.ISO_LOCAL_DATE);
-                            }
+                            // Procesar todas las transacciones
+                            List<TransactionDataDto> dtos = transactionsList.stream()
+                                .map(data -> {
+                                    BigDecimal amount = new BigDecimal(data.getOrDefault("amount", "0.00").toString());
+                                    String currency = (String) data.getOrDefault("currency", "USD");
+                                    String description = (String) data.getOrDefault("description", "Transacción procesada");
+                                    String category = (String) data.getOrDefault("category", "OTHER");
 
-                            var dto = new TransactionDataDto(amount, currency, description, category, transactionDateStr);
-                            return List.of(dto); // Devolvemos una lista con un solo elemento
+                                    // --- MANEJO DE FECHA NULA ---
+                                    // Si la fecha es nula o no existe, usa la de hoy.
+                                    String transactionDateStr = (String) data.get("transactionDate");
+                                    if (transactionDateStr == null || transactionDateStr.isBlank()) {
+                                        transactionDateStr = LocalDate.now().format(DateTimeFormatter.ISO_LOCAL_DATE);
+                                    }
+
+                                    return new TransactionDataDto(amount, currency, description, category, transactionDateStr);
+                                })
+                                .toList();
+
+                            return dtos;
                         }
                     }
                 }

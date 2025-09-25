@@ -17,6 +17,9 @@ public class TransactionDbo {
     private UUID userId;
 
     @Column(nullable = false)
+    private Long transactionNumber;
+
+    @Column(nullable = false)
     private BigDecimal amountValue;
 
     @Column(nullable = false)
@@ -37,9 +40,10 @@ public class TransactionDbo {
     public TransactionDbo() {}
 
     // Constructor
-    public TransactionDbo(UUID id, UUID userId, BigDecimal amountValue, String currency, String description, String category, Instant createdAt, LocalDate transactionDate) {
+    public TransactionDbo(UUID id, UUID userId, Long transactionNumber, BigDecimal amountValue, String currency, String description, String category, Instant createdAt, LocalDate transactionDate) {
         this.id = id;
         this.userId = userId;
+        this.transactionNumber = transactionNumber;
         this.amountValue = amountValue;
         this.currency = currency;
         this.description = description;
@@ -63,6 +67,14 @@ public class TransactionDbo {
 
     public void setUserId(UUID userId) {
         this.userId = userId;
+    }
+
+    public Long getTransactionNumber() {
+        return transactionNumber;
+    }
+
+    public void setTransactionNumber(Long transactionNumber) {
+        this.transactionNumber = transactionNumber;
     }
 
     public BigDecimal getAmountValue() {

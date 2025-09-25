@@ -1,5 +1,7 @@
-package com.lazyledger.trancriptionModule;
+package com.lazyledger.transcription.transcribers;
 
+import com.lazyledger.transcription.extractor.DataExtractor;
+import com.lazyledger.transcription.extractor.TransactionDataDto;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
