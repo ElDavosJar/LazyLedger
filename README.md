@@ -91,23 +91,54 @@ The implementation of this domain is being done with an enterprise-grade stack, 
 - **Testing:** JUnit 5 with Spring Boot Test.
 - **Design Principles:** Rich Domain Model, Clean Architecture, Strategy Pattern, Dependency Injection, Immutability.
 
-## 7. Project Status and Next Steps
+## 7. Setup Instructions
+
+### Prerequisites
+- Java 21 (OpenJDK)
+- Maven 3.6+
+- PostgreSQL 12+
+
+### Configuration
+1. Copy the example configuration file:
+   ```bash
+   cp src/main/resources/application.properties.example src/main/resources/application.properties
+   ```
+
+2. Update the `application.properties` file with your actual values:
+   - Database credentials
+   - Google AI API key (from Google AI Studio)
+   - Telegram bot token (from @BotFather)
+
+### Database Setup
+1. Create a PostgreSQL database named `lazyledger_db`
+2. Update the connection details in `application.properties`
+
+### Running the Application
+```bash
+mvn spring-boot:run
+```
+
+The application will start on port 8090 and the Telegram bot will be active.
+
+## 8. Project Status and Next Steps
 
 ### Current Status:
 ✅ Domain Model (domain) defined and fully implemented. Includes the Transaction entity, Value Objects, and the TransactionRepository interface.
 ✅ Infrastructure layer (infrastructure) implemented using Spring Data JPA and PostgreSQL.
 ✅ RESTful API (api) built with Spring Boot to expose CRUD operations with standardized ApiResponse format.
 ✅ Transcription Module implemented with Google Gemini LLM integration for multi-modal (audio, image, document) to text transcription and financial data extraction.
-✅ Telegram Bot Integration: Real-time message capture, binary file processing, transaction extraction, and asynchronous user feedback.
-✅ MVP Core Features: Multi-media input processing, automated transaction creation, and user notifications.
+✅ Telegram Bot Integration: Interactive menu system with inline keyboards for transaction registration and balance inquiries.
+✅ Sequential Transaction Numbering: Per-user sequential transaction IDs with database counters.
+✅ Security: Sensitive configuration removed from repository, proper .gitignore setup.
+✅ MVP Core Features: Multi-media input processing, automated transaction creation, balance calculations, and user notifications.
 
 ### Considerations:
 - **Transaction IDs**: UUID for internal machine processing, sequential per-user codes (e.g., TX-001) for UX.
 - **Security**: Sensitive configs (API keys, tokens) excluded from git, prepared for secret vault integration.
-- **Architecture**: Clean separation with adapters for external APIs, strategy pattern for transcribers.
+- **Architecture**: Clean separation with adapters for external APIs, strategy pattern for transcribers, use cases for business logic.
 
 ### Next Steps:
-🔜 Implement sequential transaction codes per user.
-🔜 Add user authentication and multi-user support.
-🔜 Deploy with secret management (vault).
-🔜 Implement transaction categorization improvements and reporting features.
+🔜 User Management Module: User registration, authentication, and multi-user support.
+🔜 Security Module: JWT authentication, API security with Spring Security, user verification for Telegram bot.
+🔜 Advanced Features: Transaction categories management, budget planning, export functionality, recurring transactions.
+🔜 Infrastructure: Docker containerization, CI/CD pipeline, monitoring, and database migrations.
