@@ -12,29 +12,25 @@ The cycle is predictable: the act of opening the app and filling out a form for 
 
 **Hypothesis:** If recording an expense were as easy as sending an audio, the success rate would increase dramatically.
 
-**Project Objective:** Build a robust backend that can serve as the core for a voice-based transaction recording application.
+**Project Objective:** Build a robust backend that can serve as the core for a voice-based transaction recording application, with modular architecture supporting ledgers and user management.
 
-## 3. Domain Design (Current State: Foundation Complete!)
+## 3. Architecture Overview
 
-The heart of the application is its domain model. The design has focused on creating a solid foundation, technology-agnostic and highly maintainable before writing any other layer of the system.
+LazyLedger follows Clean Architecture principles with modular design:
 
-The Transaction entity protects its own state (immutability, no setters) and is created through static factory methods. The use of Value Objects (TransactionId, Amount, etc.) ensures type safety and adds business context to the code.
+- **Transaction Module**: Core transaction processing with voice/image input support
+- **Ledger Module**: Multi-user ledger management with groups and memberships
+- **User Module**: User registration and domain management
+- **Commons**: Shared domain objects, identifiers, and enums
 
-This diagram represents the current and complete state of the domain model:
-
-![Domain Model Diagram](./docs/diagrams/domain-model.jpg)
-
-*(Note: Link to your domain class diagram)*
-
-## Activity Diagram
-
-This diagram shows the happy path flow of the application:
-
-![Activity Diagram](./docs/diagrams/activity-diagram.jpg)
-
-## 4. Transcription Module: Multi-Modal to Transaction Processing
+## 4. Transaction Module: Voice-Based Transaction Processing
 
 The core innovation of LazyLedger is its ability to convert various input types (voice, images, documents, text) into structured financial transactions using advanced AI.
+
+### Domain Model:
+- **Transaction Entity**: Immutable entity with factory methods, representing financial transactions
+- **Value Objects**: TransactionId, Amount (with currency), Description, TransactionDate
+- **Repository Interface**: TransactionRepository for persistence operations
 
 ### Architecture:
 - **Transcriber Interface**: Defines the contract for converting binary data to plain text.
@@ -55,9 +51,9 @@ Input: WhatsApp voice note "Hoy he gastado veinte dólares en comida."
 - **Phase 1 (Transcription)**: Audio → "Hoy he gastado veinte dólares en comida."
 - **Phase 2 (Extraction)**: Text → {amount: -20.00, currency: "USD", category: "FOOD", description: "Comida"}
 
-## 5. Telegram Bot Integration: Real-Time Message Processing
+### Telegram Bot Integration: Real-Time Message Processing
 
-LazyLedger now integrates with Telegram Bot API to capture messages in real-time and process them automatically.
+LazyLedger integrates with Telegram Bot API to capture messages in real-time and process them automatically.
 
 ### Architecture:
 - **ApiListener Interface**: Defines the contract for processing incoming updates.
@@ -77,9 +73,50 @@ LazyLedger now integrates with Telegram Bot API to capture messages in real-time
 2. System transcribes to text, extracts transaction data, saves to DB.
 3. Bot replies: "Se ha guardado. Ha registrado un gasto de $20.00 USD en fecha 2025-09-24. Código de transacción: TX-001"
 
-## 6. Selected Technology Stack
+## 5. Ledger Module: Multi-User Ledger Management
 
-The implementation of this domain is being done with an enterprise-grade stack, focused on robustness and best practices.
+The Ledger module provides collaborative financial management capabilities, allowing users to create and manage ledgers with multiple participants.
+
+### Domain Model:
+- **Ledger Entity**: Represents a financial ledger with status management (ACTIVE, INACTIVE, ARCHIVED)
+- **LedgerGroup Entity**: Groups multiple ledgers under a single owner
+- **LedgerMembership Entity**: Manages user roles within ledgers (OWNER, ASSISTANT, VIEWER)
+- **Value Objects**: LedgerName, LedgerId, LedgerGroupId, UserId
+- **Enums**: LedgerStatus, LedgerUserRole
+
+### Architecture:
+- **LedgerRepository**: Interface for ledger persistence operations
+- **LedgerGroupRepository**: Interface for ledger group management
+- **LedgerMembershipRepository**: Interface for membership operations
+- **LedgerUserService**: Application service for managing user memberships and roles
+
+### Features:
+- **Ledger Lifecycle**: Create, deactivate, archive, and unarchive ledgers
+- **Group Management**: Organize ledgers into groups for better organization
+- **Role-Based Access**: Different permission levels for ledger participants
+- **Membership Management**: Invite users, change roles, remove members
+
+## 6. User Module: User Registration Domain
+
+The User module handles user registration and basic user domain operations.
+
+### Domain Model:
+- **User Entity**: Represents registered users with immutable state
+- **Value Objects**: UserName, Email (with validation)
+- **Repository Interface**: UserRepository for user persistence
+
+### Architecture:
+- **UserRegistrationService**: Domain service for user registration with email uniqueness validation
+- **Factory Methods**: Immutable user creation through static factory methods
+
+### Features:
+- **Email Validation**: Proper email format validation
+- **Name Validation**: User name length and format constraints
+- **Registration Logic**: Prevents duplicate email registrations
+
+## 7. Selected Technology Stack
+
+The implementation uses an enterprise-grade stack, focused on robustness and best practices.
 
 - **Language:** Java 21 (OpenJDK).
 - **Framework:** Spring Boot 3.2.0 (with Spring Web, Spring Data JPA).
@@ -91,7 +128,7 @@ The implementation of this domain is being done with an enterprise-grade stack, 
 - **Testing:** JUnit 5 with Spring Boot Test.
 - **Design Principles:** Rich Domain Model, Clean Architecture, Strategy Pattern, Dependency Injection, Immutability.
 
-## 7. Setup Instructions
+## 8. Setup Instructions
 
 ### Prerequisites
 - Java 21 (OpenJDK)
@@ -120,25 +157,25 @@ mvn spring-boot:run
 
 The application will start on port 8090 and the Telegram bot will be active.
 
-## 8. Project Status and Next Steps
+## 9. Project Status and Next Steps
 
 ### Current Status:
-✅ Domain Model (domain) defined and fully implemented. Includes the Transaction entity, Value Objects, and the TransactionRepository interface.
-✅ Infrastructure layer (infrastructure) implemented using Spring Data JPA and PostgreSQL.
-✅ RESTful API (api) built with Spring Boot to expose CRUD operations with standardized ApiResponse format.
-✅ Transcription Module implemented with Google Gemini LLM integration for multi-modal (audio, image, document) to text transcription and financial data extraction.
-✅ Telegram Bot Integration: Interactive menu system with inline keyboards for transaction registration and balance inquiries.
-✅ Sequential Transaction Numbering: Per-user sequential transaction IDs with database counters.
-✅ Security: Sensitive configuration removed from repository, proper .gitignore setup.
-✅ MVP Core Features: Multi-media input processing, automated transaction creation, balance calculations, and user notifications.
+✅ **Transaction Module**: Complete domain model, infrastructure, API, transcription with LLM, Telegram bot integration, sequential numbering.
+✅ **Ledger Module**: Domain entities (Ledger, LedgerGroup, LedgerMembership), repositories, services for multi-user ledger management.
+✅ **User Module**: Domain model for user registration with validation.
+✅ **Commons**: Shared identifiers, enums, and domain objects.
+✅ **Security**: Sensitive configuration removed from repository, proper .gitignore setup.
 
 ### Considerations:
+- **Modular Architecture**: Clean separation between transaction, ledger, and user concerns.
+- **Domain-Driven Design**: Rich domain models with value objects, entities, and domain services.
 - **Transaction IDs**: UUID for internal machine processing, sequential per-user codes (e.g., TX-001) for UX.
 - **Security**: Sensitive configs (API keys, tokens) excluded from git, prepared for secret vault integration.
 - **Architecture**: Clean separation with adapters for external APIs, strategy pattern for transcribers, use cases for business logic.
 
 ### Next Steps:
-🔜 User Management Module: User registration, authentication, and multi-user support.
-🔜 Security Module: JWT authentication, API security with Spring Security, user verification for Telegram bot.
-🔜 Advanced Features: Transaction categories management, budget planning, export functionality, recurring transactions.
-🔜 Infrastructure: Docker containerization, CI/CD pipeline, monitoring, and database migrations.
+🔜 **Infrastructure Implementation**: Complete persistence layer for ledger and user modules with Spring Data JPA.
+🔜 **API Layer**: RESTful APIs for ledger and user management.
+🔜 **Security Module**: JWT authentication, API security with Spring Security, user verification for Telegram bot.
+🔜 **Advanced Features**: Transaction categories management, budget planning, export functionality, recurring transactions.
+🔜 **Infrastructure**: Docker containerization, CI/CD pipeline, monitoring, and database migrations.
