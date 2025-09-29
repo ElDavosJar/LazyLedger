@@ -14,4 +14,13 @@ public enum LedgerUserRole {
     public String getValue() {
         return value;
     }
+
+    public static LedgerUserRole fromString(String value) {
+        for (LedgerUserRole role : values()) {
+            if (role.value.equals(value)) {
+                return role;
+            }
+        }
+        throw new IllegalArgumentException("Unknown LedgerUserRole: " + value);
+    }
 }

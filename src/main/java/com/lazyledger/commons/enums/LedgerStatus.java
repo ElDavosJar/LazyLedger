@@ -15,4 +15,13 @@ public enum LedgerStatus {
     public String toString() {
         return value;
     }
+
+    public static LedgerStatus fromString(String value) {
+        for (LedgerStatus status : values()) {
+            if (status.value.equals(value)) {
+                return status;
+            }
+        }
+        throw new IllegalArgumentException("Unknown LedgerStatus: " + value);
+    }
 }

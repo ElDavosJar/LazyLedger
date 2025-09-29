@@ -1,4 +1,4 @@
-package com.lazyledger.commons;
+package com.lazyledger.commons.identifiers;
 
 import java.util.Objects;
 import java.util.UUID;

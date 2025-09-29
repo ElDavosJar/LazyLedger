@@ -1,6 +1,6 @@
 package com.lazyledger.ledger.domain.entities;
 
-import com.lazyledger.commons.UserId;
+import com.lazyledger.commons.identifiers.UserId;
 import com.lazyledger.commons.identifiers.LedgerGroupId;
 
 import com.lazyledger.ledger.domain.entities.vo.LedgerName;

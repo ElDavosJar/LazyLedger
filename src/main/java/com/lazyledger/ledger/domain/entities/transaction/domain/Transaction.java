@@ -1,11 +1,12 @@
 package com.lazyledger.ledger.domain.entities.transaction.domain;
 
-import com.lazyledger.commons.TransactionId;
+import com.lazyledger.commons.identifiers.TransactionId;
 import com.lazyledger.commons.enums.Category;
 import com.lazyledger.commons.identifiers.LedgerId;
 
 import java.math.BigDecimal;
 import java.time.Instant;
+import java.time.LocalDate;
 import java.util.Objects;
 import java.util.UUID;
 
@@ -71,16 +72,17 @@ public class Transaction {
     }
 
     @Override
-    //present simularly to JSON format for easy reading
+    //present similarly to JSON format for easy reading
     public String toString() {
         return "Transaction{\n" +
                 "id=" + id +
+                ",\n ledgerId=" + ledgerId +
                 ",\n amount=" + amount +
                 ",\n description=" + description +
                 ",\n category=" + category +
                 ",\n createdAt=" + createdAt +
                 ",\n transactionDate=" + transactionDate +
-                '}';
+                "\n}";
     }
 
     @Override
@@ -101,7 +103,7 @@ public class Transaction {
         Amount amount = Amount.of(BigDecimal.valueOf(100.00), "USD");
         Description description = Description.of("Grocery shopping");
         Category category = Category.FOOD;
-        TransactionDate transactionDate = TransactionDate.of(null);
+        TransactionDate transactionDate = TransactionDate.of(LocalDate.now());
 
         Transaction transaction = Transaction.of(transactionId, ledgerId, amount, description, category, transactionDate);
         System.out.println(transaction);
