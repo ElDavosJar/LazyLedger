@@ -136,6 +136,12 @@ mvn spring-boot:run
 
 La aplicación iniciará en el puerto 8090.
 
+### Acceso a la Documentación API
+Una vez que la aplicación esté ejecutándose, puedes acceder a la documentación interactiva de la API en:
+- **Swagger UI**: `http://localhost:8090/swagger-ui.html`
+- **OpenAPI JSON**: `http://localhost:8090/v3/api-docs`
+- **OpenAPI YAML**: `http://localhost:8090/v3/api-docs.yaml`
+
 ## 8. Estado del Proyecto y Próximos Pasos
 
 ### Estado Actual:
@@ -145,6 +151,8 @@ La aplicación iniciará en el puerto 8090.
 ✅ **Arquitectura Limpia**: Separación apropiada de responsabilidades con capas de dominio, aplicación, infraestructura y API
 ✅ **Integración de Base de Datos**: PostgreSQL con JPA/Hibernate
 ✅ **API REST**: Endpoints RESTful completos para gestión de libros contables y transacciones
+✅ **Manejo de Excepciones por Capas**: Sistema completo de excepciones jerárquicas con validación end-to-end
+✅ **Documentación OpenAPI**: Documentación interactiva completa con SpringDoc OpenAPI 3.x
 
 ### Aspectos Destacados de Arquitectura:
 - **Diseño Modular**: Separación limpia entre preocupaciones de ledger, usuario y comunes
@@ -155,11 +163,29 @@ La aplicación iniciará en el puerto 8090.
 - **Entidades Inmutables**: Objetos de dominio con validación apropiada y métodos factory
 
 ### Próximos Pasos:
-🔜 **Integración de Voz**: Agregar capacidades de transcripción de voz a texto (Google Gemini LLM)
-🔜 **Bot de Telegram**: Procesamiento de mensajes en tiempo real para transacciones de voz
-🔜 **Módulo de Seguridad**: Autenticación JWT y seguridad de API con Spring Security
-🔜 **Características Avanzadas**: Planificación de presupuestos, funcionalidad de exportación, transacciones recurrentes
-🔜 **Infraestructura**: Containerización Docker, pipeline CI/CD, monitoreo y migraciones de base de datos
+
+🔜 **Integración de Voz**:
+- Agregar capacidades de transcripción de voz a texto (Google Gemini LLM)
+- Implementar procesamiento de audio para extracción de datos de transacciones
+
+🔜 **Bot de Telegram**:
+- Procesamiento de mensajes en tiempo real para transacciones de voz
+- Integración con Telegram Bot API para recepción de mensajes de audio
+
+🔜 **Módulo de Seguridad**:
+- Autenticación JWT y seguridad de API con Spring Security
+- Implementar control de acceso basado en roles para operaciones de ledger
+
+🔜 **Características Avanzadas**:
+- Planificación de presupuestos y alertas de gastos
+- Funcionalidad de exportación (PDF, Excel, CSV)
+- Transacciones recurrentes y recordatorios automáticos
+
+🔜 **Infraestructura**:
+- Containerización Docker completa del proyecto
+- Pipeline CI/CD con GitHub Actions
+- Monitoreo y logging con ELK stack
+- Migraciones de base de datos con Flyway
 
 ---
 
@@ -297,6 +323,12 @@ mvn spring-boot:run
 
 The application will start on port 8090.
 
+### API Documentation Access
+Once the application is running, you can access the interactive API documentation at:
+- **Swagger UI**: `http://localhost:8090/swagger-ui.html`
+- **OpenAPI JSON**: `http://localhost:8090/v3/api-docs`
+- **OpenAPI YAML**: `http://localhost:8090/v3/api-docs.yaml`
+
 ## 8. Project Status and Next Steps
 
 ### Current Status:
@@ -306,6 +338,8 @@ The application will start on port 8090.
 ✅ **Clean Architecture**: Proper separation of concerns with domain, application, infrastructure, and API layers
 ✅ **Database Integration**: PostgreSQL with JPA/Hibernate
 ✅ **REST API**: Complete RESTful endpoints for ledger and transaction management
+✅ **Layered Exception Handling**: Complete hierarchical exception system with end-to-end validation
+✅ **OpenAPI Documentation**: Complete interactive documentation with SpringDoc OpenAPI 3.x
 
 ### Architecture Highlights:
 - **Modular Design**: Clean separation between ledger, user, and common concerns
@@ -316,8 +350,26 @@ The application will start on port 8090.
 - **Immutable Entities**: Domain objects with proper validation and factory methods
 
 ### Next Steps:
-🔜 **Voice Integration**: Add voice-to-text transcription capabilities (Google Gemini LLM)
-🔜 **Telegram Bot**: Real-time message processing for voice transactions
-🔜 **Security Module**: JWT authentication and API security with Spring Security
-🔜 **Advanced Features**: Budget planning, export functionality, recurring transactions
-🔜 **Infrastructure**: Docker containerization, CI/CD pipeline, monitoring, and database migrations
+
+🔜 **Voice Integration**:
+- Add voice-to-text transcription capabilities (Google Gemini LLM)
+- Implement audio processing for transaction data extraction
+
+🔜 **Telegram Bot**:
+- Real-time message processing for voice transactions
+- Integration with Telegram Bot API for audio message reception
+
+🔜 **Security Module**:
+- JWT authentication and API security with Spring Security
+- Implement role-based access control for ledger operations
+
+🔜 **Advanced Features**:
+- Budget planning and expense alerts
+- Export functionality (PDF, Excel, CSV)
+- Recurring transactions and automatic reminders
+
+🔜 **Infrastructure**:
+- Complete Docker containerization of the project
+- CI/CD pipeline with GitHub Actions
+- Monitoring and logging with ELK stack
+- Database migrations with Flyway

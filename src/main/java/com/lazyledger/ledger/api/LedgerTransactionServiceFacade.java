@@ -1,6 +1,8 @@
 package com.lazyledger.ledger.api;
 
 import com.lazyledger.commons.enums.Category;
+import com.lazyledger.commons.exceptions.InvalidInputException;
+import com.lazyledger.commons.exceptions.TransactionNotFoundException;
 import com.lazyledger.commons.identifiers.LedgerId;
 import com.lazyledger.commons.identifiers.TransactionId;
 import com.lazyledger.ledger.api.dto.CreateTransactionRequest;
@@ -10,6 +12,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
+import java.time.format.DateTimeParseException;
 import java.util.List;
 import java.util.UUID;
 
@@ -24,44 +27,79 @@ public class LedgerTransactionServiceFacade {
     }
 
     public TransactionDto addTransaction(CreateTransactionRequest request) {
-        var transaction = manageLedgerTransactionsUseCase.createTransaction(
-            LedgerId.of(UUID.fromString(request.ledgerId())),
-            request.amount(),
-            request.currency(),
-            request.description(),
-            Category.fromString(request.category()),
-            LocalDate.parse(request.transactionDate())
-        );
-        return LedgerTransactionMapper.toTransactionDto(transaction);
+        try {
+            UUID ledgerUuid = UUID.fromString(request.ledgerId());
+            LedgerId ledgerId = LedgerId.of(ledgerUuid);
+            LocalDate txDate = LocalDate.parse(request.transactionDate());
+            Category category = Category.fromString(request.category());
+            var transaction = manageLedgerTransactionsUseCase.createTransaction(
+                ledgerId,
+                request.amount(),
+                request.currency(),
+                request.description(),
+                category,
+                txDate
+            );
+            return LedgerTransactionMapper.toTransactionDto(transaction);
+        } catch (IllegalArgumentException e) {
+            throw new InvalidInputException("Invalid input data: " + e.getMessage(), e);
+        } catch (DateTimeParseException e) {
+            throw new InvalidInputException("Invalid transaction date format: " + request.transactionDate(), e);
+        }
     }
 
     public TransactionDto getTransactionById(String transactionId) {
-        var transactionOpt = manageLedgerTransactionsUseCase.findTransactionById(TransactionId.of(UUID.fromString(transactionId)));
-        if (transactionOpt.isEmpty()) {
-            throw new IllegalArgumentException("Transaction not found: " + transactionId);
+        try {
+            UUID txUuid = UUID.fromString(transactionId);
+            var transactionOpt = manageLedgerTransactionsUseCase.findTransactionById(TransactionId.of(txUuid));
+            if (transactionOpt.isEmpty()) {
+                throw new TransactionNotFoundException(transactionId);
+            }
+            return LedgerTransactionMapper.toTransactionDto(transactionOpt.get());
+        } catch (IllegalArgumentException e) {
+            throw new InvalidInputException("Invalid transaction ID format: " + transactionId, e);
         }
-        return LedgerTransactionMapper.toTransactionDto(transactionOpt.get());
     }
 
     public List<TransactionDto> getTransactionsByLedgerId(String ledgerId) {
-        var transactions = manageLedgerTransactionsUseCase.findTransactionsByLedger(LedgerId.of(UUID.fromString(ledgerId)));
-        return transactions.stream()
-            .map(LedgerTransactionMapper::toTransactionDto)
-            .toList();
+        try {
+            UUID ledgerUuid = UUID.fromString(ledgerId);
+            var transactions = manageLedgerTransactionsUseCase.findTransactionsByLedger(LedgerId.of(ledgerUuid));
+            return transactions.stream()
+                .map(LedgerTransactionMapper::toTransactionDto)
+                .toList();
+        } catch (IllegalArgumentException e) {
+            throw new InvalidInputException("Invalid ledger ID format: " + ledgerId, e);
+        }
     }
 
     public List<TransactionDto> getTransactionsByLedgerIdAndDateRange(String ledgerId, String startDate, String endDate) {
-        var transactions = manageLedgerTransactionsUseCase.findTransactionsByLedgerAndDateRange(
-            LedgerId.of(UUID.fromString(ledgerId)),
-            LocalDate.parse(startDate),
-            LocalDate.parse(endDate)
-        );
-        return transactions.stream()
-            .map(LedgerTransactionMapper::toTransactionDto)
-            .toList();
+        try {
+            UUID ledgerUuid = UUID.fromString(ledgerId);
+            LedgerId ledgerIdObj = LedgerId.of(ledgerUuid);
+            LocalDate start = LocalDate.parse(startDate);
+            LocalDate end = LocalDate.parse(endDate);
+            var transactions = manageLedgerTransactionsUseCase.findTransactionsByLedgerAndDateRange(
+                ledgerIdObj,
+                start,
+                end
+            );
+            return transactions.stream()
+                .map(LedgerTransactionMapper::toTransactionDto)
+                .toList();
+        } catch (IllegalArgumentException e) {
+            throw new InvalidInputException("Invalid ledger ID format: " + ledgerId, e);
+        } catch (DateTimeParseException e) {
+            throw new InvalidInputException("Invalid date format: " + e.getMessage(), e);
+        }
     }
 
     public void deleteTransaction(String transactionId) {
-        manageLedgerTransactionsUseCase.deleteTransaction(TransactionId.of(UUID.fromString(transactionId)));
+        try {
+            UUID txUuid = UUID.fromString(transactionId);
+            manageLedgerTransactionsUseCase.deleteTransaction(TransactionId.of(txUuid));
+        } catch (IllegalArgumentException e) {
+            throw new InvalidInputException("Invalid transaction ID format: " + transactionId, e);
+        }
     }
 }

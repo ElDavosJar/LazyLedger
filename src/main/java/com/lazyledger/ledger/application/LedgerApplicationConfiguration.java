@@ -36,8 +36,9 @@ public class LedgerApplicationConfiguration {
     }
 
     @Bean
-    public ManageLedgerTransactionsUseCase manageLedgerTransactionsUseCase(TransactionRepository transactionRepository) {
-        return new ManageLedgerTransactionsUseCase(transactionRepository);
+    public ManageLedgerTransactionsUseCase manageLedgerTransactionsUseCase(TransactionRepository transactionRepository,
+                                                                          LedgerRepository ledgerRepository) {
+        return new ManageLedgerTransactionsUseCase(transactionRepository, ledgerRepository);
     }
 
     @Bean

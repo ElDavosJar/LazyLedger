@@ -26,7 +26,7 @@ public class CreateLedgerUseCase {
         this.mappingUseCase = mappingUseCase;
     }
 
-    public Ledger createLedger(UserId createdBy, LedgerName name, String groupId, String groupName) {
+    public Ledger createLedger(UserId createdBy, LedgerName name, Optional<UUID> groupIdOpt, String groupName) {
         LedgerId id = LedgerId.of(UUID.randomUUID());
         Ledger ledger = Ledger.create(id, createdBy, name);
         Ledger savedLedger = ledgerRepository.save(ledger);
@@ -35,9 +35,9 @@ public class CreateLedgerUseCase {
         membershipUseCase.createMembership(createdBy, id, LedgerUserRole.OWNER);
 
         // Handle optional group
-        if (groupId != null && !groupId.trim().isEmpty()) {
+        if (groupIdOpt.isPresent()) {
             // Use existing group
-            LedgerGroupId existingGroupId = LedgerGroupId.of(UUID.fromString(groupId));
+            LedgerGroupId existingGroupId = LedgerGroupId.of(groupIdOpt.get());
             mappingUseCase.createMapping(id, existingGroupId);
         } else if (groupName != null && !groupName.trim().isEmpty()) {
             // Check if user already has a group with this name, if not create it

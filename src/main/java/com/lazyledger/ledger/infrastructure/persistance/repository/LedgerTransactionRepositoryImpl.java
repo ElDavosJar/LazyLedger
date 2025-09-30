@@ -1,18 +1,19 @@
 package com.lazyledger.ledger.infrastructure.persistance.repository;
 
 import com.lazyledger.commons.enums.Category;
+import com.lazyledger.commons.exceptions.DatabaseException;
 import com.lazyledger.commons.identifiers.LedgerId;
 import com.lazyledger.commons.identifiers.TransactionId;
 import com.lazyledger.ledger.domain.entities.transaction.domain.*;
 import com.lazyledger.ledger.domain.repositories.TransactionRepository;
 import com.lazyledger.ledger.infrastructure.persistance.entity.TransactionDbo;
 import com.lazyledger.ledger.infrastructure.persistance.postgres.SpringDataJpaLedgerTransactionRepository;
+import org.springframework.dao.DataAccessException;
 import org.springframework.stereotype.Repository;
 
 import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
-import java.util.UUID;
 import java.util.stream.Collectors;
 
 @Repository
@@ -26,41 +27,65 @@ public class LedgerTransactionRepositoryImpl implements TransactionRepository {
 
     @Override
     public Transaction save(Transaction transaction) {
-        TransactionDbo dbo = toDbo(transaction);
-        TransactionDbo saved = jpaRepository.save(dbo);
-        return toDomain(saved);
+        try {
+            TransactionDbo dbo = toDbo(transaction);
+            TransactionDbo saved = jpaRepository.save(dbo);
+            return toDomain(saved);
+        } catch (DataAccessException e) {
+            throw new DatabaseException("Failed to save transaction", e);
+        }
     }
 
     @Override
     public Optional<Transaction> findById(TransactionId id) {
-        Optional<TransactionDbo> dboOpt = jpaRepository.findById(id.value());
-        return dboOpt.map(this::toDomain);
+        try {
+            Optional<TransactionDbo> dboOpt = jpaRepository.findById(id.value());
+            return dboOpt.map(this::toDomain);
+        } catch (DataAccessException e) {
+            throw new DatabaseException("Failed to find transaction by ID: " + id.value(), e);
+        }
     }
 
     @Override
     public List<Transaction> findAll() {
-        return jpaRepository.findAll().stream()
-            .map(this::toDomain)
-            .collect(Collectors.toList());
+        try {
+            return jpaRepository.findAll().stream()
+                .map(this::toDomain)
+                .collect(Collectors.toList());
+        } catch (DataAccessException e) {
+            throw new DatabaseException("Failed to find all transactions", e);
+        }
     }
 
     @Override
     public List<Transaction> findByLedgerId(LedgerId ledgerId) {
-        return jpaRepository.findByLedgerId(ledgerId.value()).stream()
-            .map(this::toDomain)
-            .collect(Collectors.toList());
+        try {
+            return jpaRepository.findByLedgerId(ledgerId.value()).stream()
+                .map(this::toDomain)
+                .collect(Collectors.toList());
+        } catch (DataAccessException e) {
+            throw new DatabaseException("Failed to find transactions by ledger ID: " + ledgerId.value(), e);
+        }
     }
 
     @Override
     public List<Transaction> findByLedgerIdAndDateRange(LedgerId ledgerId, LocalDate startDate, LocalDate endDate) {
-        return jpaRepository.findByLedgerIdAndTransactionDateBetween(ledgerId.value(), startDate, endDate).stream()
-            .map(this::toDomain)
-            .collect(Collectors.toList());
+        try {
+            return jpaRepository.findByLedgerIdAndTransactionDateBetween(ledgerId.value(), startDate, endDate).stream()
+                .map(this::toDomain)
+                .collect(Collectors.toList());
+        } catch (DataAccessException e) {
+            throw new DatabaseException("Failed to find transactions by ledger ID and date range: " + ledgerId.value(), e);
+        }
     }
 
     @Override
     public void delete(TransactionId id) {
-        jpaRepository.deleteById(id.value());
+        try {
+            jpaRepository.deleteById(id.value());
+        } catch (DataAccessException e) {
+            throw new DatabaseException("Failed to delete transaction: " + id.value(), e);
+        }
     }
 
     private TransactionDbo toDbo(Transaction transaction) {

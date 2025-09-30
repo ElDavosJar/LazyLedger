@@ -1,9 +1,12 @@
 package com.lazyledger.ledger.application;
 
 import com.lazyledger.commons.enums.Category;
+import com.lazyledger.commons.exceptions.LedgerNotFoundException;
+import com.lazyledger.commons.exceptions.TransactionNotFoundException;
 import com.lazyledger.commons.identifiers.LedgerId;
 import com.lazyledger.commons.identifiers.TransactionId;
 import com.lazyledger.ledger.domain.entities.transaction.domain.*;
+import com.lazyledger.ledger.domain.repositories.LedgerRepository;
 import com.lazyledger.ledger.domain.repositories.TransactionRepository;
 
 import java.math.BigDecimal;
@@ -15,14 +18,26 @@ import java.util.UUID;
 public class ManageLedgerTransactionsUseCase {
 
     private final TransactionRepository transactionRepository;
+    private final LedgerRepository ledgerRepository;
 
-    public ManageLedgerTransactionsUseCase(TransactionRepository transactionRepository) {
+    public ManageLedgerTransactionsUseCase(TransactionRepository transactionRepository,
+                                         LedgerRepository ledgerRepository) {
         this.transactionRepository = transactionRepository;
+        this.ledgerRepository = ledgerRepository;
+    }
+
+    // Validate that a ledger exists
+    private void validateLedgerExists(LedgerId ledgerId) {
+        if (ledgerRepository.findById(ledgerId).isEmpty()) {
+            throw new LedgerNotFoundException(ledgerId.value().toString());
+        }
     }
 
     // Create a new transaction for a ledger
     public Transaction createTransaction(LedgerId ledgerId, BigDecimal amount, String currency,
                                        String description, Category category, LocalDate transactionDate) {
+        validateLedgerExists(ledgerId);
+
         TransactionId id = TransactionId.of(UUID.randomUUID());
         Amount transactionAmount = Amount.of(amount, currency);
         Description transactionDescription = description != null ? Description.of(description) : null;
@@ -41,6 +56,7 @@ public class ManageLedgerTransactionsUseCase {
 
     // Find all transactions for a ledger
     public List<Transaction> findTransactionsByLedger(LedgerId ledgerId) {
+        validateLedgerExists(ledgerId);
         return transactionRepository.findByLedgerId(ledgerId);
     }
 
@@ -48,6 +64,7 @@ public class ManageLedgerTransactionsUseCase {
     public List<Transaction> findTransactionsByLedgerAndDateRange(LedgerId ledgerId,
                                                                  LocalDate startDate,
                                                                  LocalDate endDate) {
+        validateLedgerExists(ledgerId);
         return transactionRepository.findByLedgerIdAndDateRange(ledgerId, startDate, endDate);
     }
 
@@ -56,7 +73,7 @@ public class ManageLedgerTransactionsUseCase {
                                        String description, Category category, LocalDate transactionDate) {
         Optional<Transaction> existing = transactionRepository.findById(id);
         if (existing.isEmpty()) {
-            throw new IllegalArgumentException("Transaction not found: " + id);
+            throw new TransactionNotFoundException(id.value().toString());
         }
 
         Transaction oldTransaction = existing.get();
